@@ -103,7 +103,10 @@ for pos in range(len(data)-1,1, -1):
         foundFlag = 1
     if  element == "SEPA":
         Zahlungsbeteiligter = data[pos+1][0]
-        Betrag = "-" + data[pos+2][0].replace("€","")
+        if Zahlungsbeteiligter.split()[1] == "Incoming":
+            pass
+        elif Zahlungsbeteiligter.split()[1] == "Outgoing":
+            Betrag = "-" + data[pos+2][0].replace("€","")
         foundFlag = 1
         
     if element == "Handel":
