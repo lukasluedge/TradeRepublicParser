@@ -111,9 +111,9 @@ for pos in range(len(data)-1,1, -1):
         direction = data[pos + 1][0].split()[3]
         
         Betrag = data[findBetragPos(data, pos)][0].replace("€", "")
-        if direction == "Kauf" or data[pos + 1][0].split()[2] == "execution":
+        if direction == "Kauf" or data[pos + 1][0].split()[2] == "execution" or data[pos + 1][0].split()[0] == "Buy":
             pass
-        elif direction == "Verkauf":
+        elif direction == "Verkauf" or data[pos + 1][0].split()[0] == "Sell":
             Betrag = "-" + Betrag
         else:
             print("*********ERORR with parsing Handel direction! got direction:",direction)
@@ -127,7 +127,7 @@ for pos in range(len(data)-1,1, -1):
     if globalFlag:
         globalDF.loc[globalRow] = [formatDate(Datum), Zahlungsbeteiligter, Betrag]
         globalRow += 1
-               
+    
 df["Betrag"] = df["Betrag"].str.replace(".", "", regex=False)  # Entferne Tausenderpunkte
 df["Betrag"] = df["Betrag"].str.replace(",", ".", regex=False).astype(float)  # Ersetze Komma & wandle in Float
 df["Datum"] = pd.to_datetime(df["Datum"])
