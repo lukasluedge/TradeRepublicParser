@@ -1,12 +1,12 @@
 import fitz  # PyMuPDF
 import pandas as pd
-
-pdf_path = r"C:\Tickets\Finanzen\new_setup\Downloaded_Data\Kontoauszug_neu.pdf"  # Pfad zu deinem PDF
-output_csv = r"C:\Tickets\Finanzen\new_setup\Downloaded_Data\kontoauszug.csv"  # Ziel-CSV-Datei
-output_excel =  r"C:\Tickets\Finanzen\new_setup\Input_Data\TR_Daten.xlsx"
-debugFile =  r"C:\Tickets\Finanzen\new_setup\Downloaded_Data\debug.csv"
-globalFile = r"C:\Tickets\Finanzen\new_setup\Non_pipeline_files\globalTR.csv"
-portfolioFile = r"C:\Tickets\Finanzen\new_setup\Non_pipeline_files\portfolioTR.csv"
+#skrip muss aus repo hauptdirectory ausgeführt werden
+pdf_path        = r"..\..\Downloaded_Data\Kontoauszug_neu.pdf"  # Pfad zu deinem PDF
+output_csv      = r"..\..\Downloaded_Data\kontoauszug.csv"  # Ziel-CSV-Datei
+output_excel    = r"..\..\Input_Data\TR_Daten.xlsx"
+debugFile       = r"..\..\Downloaded_Data\debug.csv"
+globalFile      = r"..\..\Non_pipeline_files\globalTR.csv"
+portfolioFile   = r"..\..\Non_pipeline_files\portfolioTR.csv"
 
 DEBUG = True
 
