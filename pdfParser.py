@@ -6,6 +6,7 @@ output_csv = r"C:\Tickets\Finanzen\new_setup\Downloaded_Data\kontoauszug.csv"  #
 output_excel =  r"C:\Tickets\Finanzen\new_setup\Input_Data\TR_Daten.xlsx"
 debugFile =  r"C:\Tickets\Finanzen\new_setup\Downloaded_Data\debug.csv"
 globalFile = r"C:\Tickets\Finanzen\new_setup\Non_pipeline_files\globalTR.csv"
+portfolioFile = r"C:\Tickets\Finanzen\new_setup\Non_pipeline_files\portfolioTR.csv"
 
 DEBUG = True
 
@@ -97,13 +98,35 @@ def parseBaseCase(data:list[list[str]], pos:int) -> tuple[str,str]:
     return Zahlungsbeteiligter, Betrag
         
 
+def findStockID(data:list[list[str]], pos:int) -> str:
+    StockID = ""
+    searchLine = data[pos][0].split()
+    for element in searchLine:
+        if len(element) == 12 and element[:2].isascii() and element[2:4].isdigit():
+            StockID = element
+            return StockID
+        
+    print("*********ERROR: StockID not found in line:", searchLine)
 
+def findQuantaty(searchLine:str) -> str:
+    quantaty = ""
+    for element in searchLine.split():
+        if element.isdigit():
+            quantaty = element
+            return quantaty
+    print("*********ERROR: Quantaty not found in line:", searchLine)
+    
 
 def parseTrade(data:list[list[str]], pos:int) -> tuple[str,str]:
-    Zahlungsbeteiligter = "Portfolio Transaction: " + data[pos + 1][0].split()[4]
+    Zahlungsbeteiligter = "Portfolio Transaction: " + str(findStockID(data, pos + 1))
+    #find quantaty
+    BetragPos = findBetragPos(data, pos)
+    searchLine = "".join([e[0] for e in data[pos+1:BetragPos]])
+    quantaty = findQuantaty(searchLine)
+    
     direction = data[pos + 1][0].split()[3]
     
-    Betrag = data[findBetragPos(data, pos)][0].replace("€", "")
+    Betrag = data[BetragPos][0].replace("€", "")
     if direction == "Kauf" or data[pos + 1][0].split()[2] == "execution" or data[pos + 1][0].split()[0] == "Buy":
         Betrag = "-" + Betrag
     elif direction == "Verkauf" or data[pos + 1][0].split()[0] == "Sell":
@@ -122,7 +145,7 @@ data = getPdfData(pdf_path)
 
 #setup parsing of "data"
 df = pd.DataFrame(columns=["Datum", "Zahlungsbeteiligter", "Betrag"])
-globalDF = pd.DataFrame(columns = ["Datum", "Zahlungsbeteiligter", "Betrag", "Saldo_Download"])
+globalDF = pd.DataFrame(columns = ["Datum", "Tag", "Zahlungsbeteiligter", "Betrag", "Saldo_Download"])
 row = 0
 globalRow = 0
 Saldo = 0
@@ -158,7 +181,7 @@ for pos in range(len(data)-1,1, -1):
         
     if globalFlag or foundFlag:
         Saldo = float(data[findBetragPos(data, pos)+1][0].replace(".", "").replace(",", ".").replace("€", ""))
-        globalDF.loc[globalRow] = [formatDate(Datum), Zahlungsbeteiligter, Betrag, Saldo]
+        globalDF.loc[globalRow] = [formatDate(Datum),element, Zahlungsbeteiligter, Betrag, Saldo]
         globalRow += 1
        
         
@@ -169,6 +192,7 @@ df["Betrag"] = df["Betrag"].str.replace(",", ".", regex=False).astype(float)  # 
 globalDF["Betrag"] = globalDF["Betrag"].str.replace(".", "", regex=False)  # Entferne Tausenderpunkte
 globalDF["Betrag"] = globalDF["Betrag"].str.replace(",", ".", regex=False).astype(float)  # Ersetze Komma & wandle in Float
 print(globalDF["Betrag"].sum())
+print(df["Betrag"].sum())
 
 df["Datum"] = pd.to_datetime(df["Datum"])
 
